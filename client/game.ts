@@ -1,3 +1,5 @@
+import { FeedbackManager } from './feedback';
+
 type Color = 'red' | 'yellow' | 'blue' | 'green';
 
 const COLORS: Color[] = ['red', 'yellow', 'blue', 'green'];
@@ -14,6 +16,7 @@ class ColorMemoryGame {
   private isShowingSequence: boolean = false;
   private level: number = 0;
   private highScore: number = 0;
+  private feedbackManager: FeedbackManager;
 
   private readonly buttons: NodeListOf<HTMLButtonElement>;
   private readonly startBtn: HTMLButtonElement;
@@ -25,6 +28,7 @@ class ColorMemoryGame {
   private readonly lightOffDuration: number = 300;
 
   constructor() {
+    this.feedbackManager = new FeedbackManager();
     this.buttons = document.querySelectorAll('.color-btn');
     this.startBtn = document.getElementById('start-btn') as HTMLButtonElement;
     this.currentLevelEl = document.getElementById('current-level') as HTMLElement;
@@ -36,15 +40,22 @@ class ColorMemoryGame {
 
   private async init(): Promise<void> {
     this.setupEventListeners();
+    this.feedbackManager.init();
     await this.fetchHighScore();
   }
 
   private setupEventListeners(): void {
-    this.startBtn.addEventListener('click', () => this.startGame());
+    this.startBtn.addEventListener('click', () => {
+      this.startGame();
+    });
 
     this.buttons.forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const color = (e.target as HTMLButtonElement).dataset.color as Color;
+        const button = e.target as HTMLButtonElement;
+        const color = button.dataset.color as Color;
+        if (this.isPlaying && !this.isShowingSequence) {
+          this.feedbackManager.onButtonClick(button, color);
+        }
         this.handlePlayerInput(color);
       });
     });
@@ -76,6 +87,7 @@ class ColorMemoryGame {
 
       if (data.isNewRecord) {
         this.showStatus('🎉 新纪录！', 'success');
+        this.feedbackManager.onNewRecord();
       }
     } catch (error) {
       console.error('保存最高分失败:', error);
@@ -133,6 +145,7 @@ class ColorMemoryGame {
     if (!button) return;
 
     button.classList.add('active');
+    this.feedbackManager.playSound(color, this.lightOnDuration - 100);
     await this.delay(this.lightOnDuration);
     button.classList.remove('active');
   }
@@ -155,6 +168,7 @@ class ColorMemoryGame {
       this.playerIndex++;
 
       if (this.playerIndex === this.sequence.length) {
+        this.feedbackManager.onCorrect();
         this.showStatus('正确！准备下一关...', 'success');
         this.setButtonsDisabled(true);
         await this.delay(1000);
@@ -162,6 +176,7 @@ class ColorMemoryGame {
       }
     } else {
       button?.classList.add('wrong');
+      this.feedbackManager.onWrong();
       await this.delay(500);
       button?.classList.remove('wrong');
 
@@ -176,6 +191,7 @@ class ColorMemoryGame {
 
     const finalScore = this.level - 1;
     this.showStatus(`游戏结束！你完成了 ${finalScore} 关`, 'gameover');
+    this.feedbackManager.onGameOver();
 
     if (finalScore > this.highScore) {
       await this.saveHighScore(finalScore);

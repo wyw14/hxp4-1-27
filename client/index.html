@@ -24,14 +24,48 @@
     <div id="game-status" class="game-status">点击开始按钮开始游戏</div>
 
     <div class="game-board">
-      <button class="color-btn red" data-color="red"></button>
-      <button class="color-btn yellow" data-color="yellow"></button>
-      <button class="color-btn blue" data-color="blue"></button>
-      <button class="color-btn green" data-color="green"></button>
+      <button class="color-btn red" data-color="red"><span class="btn-label">红</span></button>
+      <button class="color-btn yellow" data-color="yellow"><span class="btn-label">黄</span></button>
+      <button class="color-btn blue" data-color="blue"><span class="btn-label">蓝</span></button>
+      <button class="color-btn green" data-color="green"><span class="btn-label">绿</span></button>
     </div>
 
     <div class="controls">
       <button id="start-btn" class="start-btn">开始游戏</button>
+    </div>
+
+    <div class="settings-panel">
+      <h3>🎮 反馈设置</h3>
+      <div class="setting-item">
+        <label for="sound-toggle">
+          <span class="setting-icon">🔊</span>
+          <span class="setting-text">点击音效</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="sound-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <label for="text-hint-toggle">
+          <span class="setting-icon">💬</span>
+          <span class="setting-text">文字提示</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="text-hint-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <label for="vibration-toggle">
+          <span class="setting-icon">📳</span>
+          <span class="setting-text">画面震动</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="vibration-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
     <div class="instructions">
